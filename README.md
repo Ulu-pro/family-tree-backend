@@ -11,3 +11,8 @@ Development mode:
 
 Production mode:  
 `python3 -m gunicorn app:app -k uvicorn.workers.UvicornWorker`
+
+You can find more information on [uvicorn.org](https://www.uvicorn.org/)
+
+After running, a new file `data.db` will be created in the project's root directory.
+It's database where API stores the data.
