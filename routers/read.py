@@ -3,24 +3,28 @@ from fastapi import APIRouter, HTTPException
 from database import db
 from models import Tree, Pair, Person
 
-router = APIRouter(prefix='/read')
+router = APIRouter(tags=['read'])
 
 
 @router.get('/trees')
-def trees_list():
-    trees = []
-    tree: Tree
-    for tree in db.query(Tree).all():
-        trees.append({
-            'id': tree.id,
-            'name': tree.name,
-            'persons_count': tree.get_entries(db, Person).count()
-        })
-    return trees
+def read_trees():
+    return db.query(Tree).all()
+
+
+@router.get('/trees/{tree_id}')
+def read_trees_info(tree_id: int):
+    tree: Tree = db.query(Tree).filter_by(id=tree_id).first()
+    if not tree:
+        raise HTTPException(404, 'Tree not found')
+
+    return {
+        'name': tree.name,
+        'members_count': tree.get_entries(db, Person).count()
+    }
 
 
 @router.get('/trees/{tree_id}/pairs')
-def pairs_list(tree_id: int):
+def read_pairs(tree_id: int):
     tree: Tree = db.query(Tree).filter_by(id=tree_id).first()
     if not tree:
         raise HTTPException(404, 'Tree not found')
@@ -37,7 +41,7 @@ def pairs_list(tree_id: int):
 
 
 @router.get('/trees/{tree_id}/pairs/{pair_id}')
-def pair_info(tree_id: int, pair_id: int):
+def read_pairs_info(tree_id: int, pair_id: int):
     tree: Tree = db.query(Tree).filter_by(id=tree_id).first()
     if not tree:
         raise HTTPException(404, 'Tree not found')
@@ -57,7 +61,7 @@ def pair_info(tree_id: int, pair_id: int):
 
 
 @router.get('/trees/{tree_id}/persons')
-def persons_list(tree_id: int):
+def read_persons(tree_id: int):
     tree: Tree = db.query(Tree).filter_by(id=tree_id).first()
     if not tree:
         raise HTTPException(404, 'Tree not found')
@@ -73,7 +77,7 @@ def persons_list(tree_id: int):
 
 
 @router.get('/trees/{tree_id}/persons/{person_id}')
-def persons_list(tree_id: int, person_id: int):
+def read_persons_info(tree_id: int, person_id: int):
     tree: Tree = db.query(Tree).filter_by(id=tree_id).first()
     if not tree:
         raise HTTPException(404, 'Tree not found')
